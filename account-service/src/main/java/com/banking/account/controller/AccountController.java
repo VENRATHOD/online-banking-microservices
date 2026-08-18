@@ -1,6 +1,7 @@
 package com.banking.account.controller;
 
 import com.banking.account.dto.AccountRequest;
+import com.banking.account.dto.AccountUserResponse;
 import com.banking.account.dto.BalanceResponse;
 import com.banking.account.dto.UpdateBalanceRequest;
 import com.banking.account.entity.Account;
@@ -59,5 +60,11 @@ public class AccountController {
 
 	    return ResponseEntity.ok(
 	            accountService.getBalance(accountNumber));
+	}
+	@GetMapping("/{accountNumber}/user")
+	public AccountUserResponse getAccountUser(
+	        @PathVariable String accountNumber) {
+
+	    return accountService.getAccountUser(accountNumber);
 	}
 }

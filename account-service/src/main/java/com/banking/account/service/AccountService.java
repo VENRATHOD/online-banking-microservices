@@ -1,6 +1,7 @@
 package com.banking.account.service;
 
 import com.banking.account.dto.AccountRequest;
+import com.banking.account.dto.AccountUserResponse;
 import com.banking.account.dto.BalanceResponse;
 import com.banking.account.dto.UpdateBalanceRequest;
 import com.banking.account.entity.Account;
@@ -8,7 +9,11 @@ import com.banking.account.exception.AccountInactiveException;
 import com.banking.account.exception.AccountNotFoundException;
 import com.banking.account.exception.InsufficientBalanceException;
 import com.banking.account.repository.AccountRepository;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +25,7 @@ public class AccountService {
 
 	private final AccountRepository accountRepository;
 
+	//@CacheEvict(value = "accountBalance", key = "#result.accountNumber")
 	public Account createAccount(AccountRequest request) {
 
 		Account account = new Account();
@@ -35,6 +41,7 @@ public class AccountService {
 
 	}
 
+	@CacheEvict(value = "accountBalance", key = "#request.accountNumber")
 	public Account updateBalance(UpdateBalanceRequest request) {
 
 	    Account account = accountRepository.findByAccountNumber(request.getAccountNumber())
@@ -51,6 +58,7 @@ public class AccountService {
 	    return accountRepository.save(account);
 	}
 	
+	@CacheEvict(value = "accountBalance", key = "#request.accountNumber")
 	public Account withdrawBalance(UpdateBalanceRequest request) {
 
 	    Account account = accountRepository.findByAccountNumber(request.getAccountNumber())
@@ -96,6 +104,7 @@ public class AccountService {
 	            new AccountNotFoundException("Account not found with account number: " + accountNumber));
 	}
 	
+	@Cacheable(value = "accountBalance", key = "#accountNumber")
 	public BalanceResponse getBalance(String accountNumber) {
 
 	    Account account = accountRepository.findByAccountNumber(accountNumber)
@@ -106,5 +115,13 @@ public class AccountService {
 	    return new BalanceResponse(
 	            account.getAccountNumber(),
 	            account.getBalance());
+	}
+	public AccountUserResponse getAccountUser(String accountNumber) {
+
+	    Account account = accountRepository
+	            .findByAccountNumber(accountNumber)
+	            .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+
+	    return new AccountUserResponse(account.getUserId());
 	}
 }

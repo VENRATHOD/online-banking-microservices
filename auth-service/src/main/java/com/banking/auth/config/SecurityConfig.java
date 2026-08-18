@@ -59,13 +59,7 @@ public class SecurityConfig {
 //                    ).permitAll()
 
                     
-                    .requestMatchers(
-                    	    "/api/auth/**",
-                    	    "/swagger-ui/**",
-                    	    "/swagger-ui.html",
-                    	    "/v3/api-docs/**",
-                    	    "/api-docs/**"
-                    	).permitAll()
+                    .requestMatchers("/api/auth/**","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**","/api-docs/**","/actuator/health").permitAll()
                     
                     // All other APIs require JWT
                     .anyRequest().authenticated()
